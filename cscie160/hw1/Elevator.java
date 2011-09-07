@@ -40,7 +40,7 @@ public class Elevator {
 		if (current_floor == 0) {
 			going_up = true;
 		}
-		else if (current_floor == NUM_FLOORS) {
+		else if (current_floor == NUM_FLOORS-1) {
 			going_up = false;
 		}
 		
@@ -58,7 +58,7 @@ public class Elevator {
 		passenger_targets[current_floor] = 0;
 		targets[current_floor] = false;
 		
-		System.out.println("Stopping on floor "+Integer.toString(current_floor));
+		System.out.println("\r\nStopping on floor "+Integer.toString(current_floor+1));
 		System.out.println(this);
 	}
 	
@@ -69,6 +69,7 @@ public class Elevator {
 	@param	floor	The passenger's target floor.
 	*/
 	public void boardPassenger(int floor) {
+		floor--;
 		targets[floor] = true;
 		passenger_targets[floor]++;
 	}
@@ -81,6 +82,21 @@ public class Elevator {
 		for (int i=0; i<passenger_targets.length; i++) {
 			passengers += passenger_targets[i];
 		}
-		return "Current Passengers: "+Integer.toString(passengers)+"\r\n Direction: "+(going_up?"Up":"Down");
+		return "Current Passengers: "+Integer.toString(passengers)+"\r\nCurrent Floor: "+Integer.toString(current_floor+1)+"\r\nDirection: "+(going_up?"Up":"Down");
+	}
+	
+	/**
+	 * For testing purposes
+	 */
+	static public void main(String argv[]) {
+		Elevator elev = new Elevator();
+		
+		elev.boardPassenger(2);
+		elev.boardPassenger(2);
+		elev.boardPassenger(3);
+		
+		for (int i=0; i<10; i++) {
+			elev.move();
+		}
 	}
 }
