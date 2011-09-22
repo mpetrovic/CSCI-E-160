@@ -1,0 +1,20 @@
+Overview
+Matt Petrovic
+Homework #1
+
+Assumptions:
+Number of Floors: 7
+Maximum Capacity: 10
+Sweep algorithm
+The elevator is bi-directional (no sideways elevators)
+The only 2 ways an elevator can be made to stop at a floor is to have a passenger destined for that floor and be called to it. 
+
+The Elevator class has 3 properties. 
+current_floor and going_up are self-explantory.
+passenger_targets keeps a list of all destinations for passengers, including passengers who have called. 
+If a passenger is heading for a floor X, passenger_target[X] is incremented once for them. 
+If a passenger is heading for floor X and another passenger calls an elevator on that floor, nothing happens.
+If no passenger is heading for floor X and the Elevator is called for X, passenger_target[x] is set to -1. 
+If passenger_target[current_floor] is anything but 0, stop and let passengers on and off.
+
+The class contains a main method for testing purposes.
