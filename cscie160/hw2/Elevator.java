@@ -8,7 +8,7 @@ public class Elevator {
 	public final static int MAX_CAPACITY = 10;
 	public final static int NUM_FLOORS = 7;
 	
-	private final static Floor[] floors;
+	private static Floor[] floors = null;
 	
 	private int current_floor;
 	private boolean going_up;
@@ -19,6 +19,7 @@ public class Elevator {
 	 * the p_t for that floor will be -1.
 	 */
 	private int[] passenger_targets;
+	private int[] stops;
 	
 	/**
 	 * Class constructor.
@@ -28,7 +29,9 @@ public class Elevator {
 		going_up = true;
 	
 		passenger_targets = new int[NUM_FLOORS+1];
-		if (floors[1] == null) {
+		stops = new int[NUM_FLOORS+1];
+		if (floors == null) {
+			floors = new Floor[NUM_FLOORS+1];
 			for (int i=1; i<NUM_FLOORS+1; i++) {
 				floors[i] = new Floor(i);
 			}
@@ -54,7 +57,7 @@ public class Elevator {
 			going_up = false;
 		}
 		
-		if (passenger_targets[current_floor] != 0) {
+		if (passenger_targets[current_floor] != 0 || stops[current_floor] != 0) {
 			stop();
 		}
 	}
@@ -67,6 +70,10 @@ public class Elevator {
 	public void stop() {
 		passenger_targets[current_floor] = 0;
 		floors[current_floor].unloadPassengers(this, going_up);
+		// they didn't board anyone. the passengers are going the other way
+		if (passenger_targets[current_floor] == 0) {
+			registerRequest(current_floor, !going_up);
+		}
 		
 		System.out.println("\r\nStopping on floor "+(current_floor));
 		System.out.println(this);
@@ -77,9 +84,10 @@ public class Elevator {
 	 * Sets the passenger's destination as a target.
 	
 	@param	floor	The passenger's target floor.
+	@throw	ElevatorFullException
 	*/
-	public void boardPassenger(int floor) {
-		if (getPassengers()) < MAX_CAPACITY) {
+	public void boardPassenger(int floor) throws ElevatorFullException {
+		if (getPassengers() < MAX_CAPACITY) {
 			passenger_targets[floor]++;
 		}
 		else {
@@ -94,10 +102,7 @@ public class Elevator {
 	@param	dir		The direction the request wants to go in. Ignored for now
 	 */
 	public void registerRequest(int floor, boolean dir) {
-		// only do something if there already aren't passengers heading for it
-		if (passenger_targets[floor] == 0) {
-			passenger_targets[floor] = -1;
-		}
+		stops[floor] = dir?1:-1;
 	}
 	
 	private int getPassengers() {
@@ -130,11 +135,21 @@ public class Elevator {
 	static public void main(String argv[]) {
 		Elevator elev = new Elevator();
 		
-		elev.boardPassenger(2);
-		elev.boardPassenger(2);
-		elev.boardPassenger(3);
+		try {
+			elev.boardPassenger(2);
+			elev.boardPassenger(2);
+			elev.boardPassenger(3);
+		}
+		catch (ElevatorFullException e) {
+		}
 		
-		for (int i=0; i<10; i++) {
+		for (int j=1; j<20; j++) {
+			int floor = j%NUM_FLOORS + j/NUM_FLOORS;
+			addPassenger(floor, false);
+			elev.registerRequest(floor, false);
+		}
+		
+		for (int i=0; i<30; i++) {
 			elev.move();
 		}
 	}

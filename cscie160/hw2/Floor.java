@@ -14,7 +14,7 @@ public class Floor {
 	 *
 	@param	floor	The number of this floor
 	 */
-	public Floor(floor) {
+	public Floor(int floor) {
 		floor_num = floor;
 		passengers_waiting_up = 0;
 		passengers_waiting_down = 0;
@@ -28,11 +28,13 @@ public class Floor {
 	 */
 	public void unloadPassengers(Elevator elev, boolean going_up) {
 		int passengers = going_up?passengers_waiting_up:passengers_waiting_down;
-		for (int i=0; i<passengers; i++) {
+		for (; passengers>0; passengers--) {
 			try {
 				elev.boardPassenger(1);
 			}
-			catch (Exception e) {
+			catch (ElevatorFullException e) {
+				System.out.println(e.getMessage());
+				elev.registerRequest(floor_num, going_up);
 				break;
 			}
 		}
@@ -42,10 +44,6 @@ public class Floor {
 		}
 		else {
 			passengers_waiting_down = passengers;
-		}
-		
-		if (passengers) {
-			elev.registerRequest(floor_num, going_up);
 		}
 	}
 	

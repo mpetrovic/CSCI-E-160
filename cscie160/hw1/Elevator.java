@@ -11,7 +11,11 @@ public class Elevator {
 	private int current_floor;
 	private boolean going_up;
 	
-	private boolean[] targets;
+	/*
+	 * Stores the number of passengers heading for each floor.
+	 * If the elevator is called from a floor with no passengers, 
+	 * the p_t for that floor will be -1.
+	 */
 	private int[] passenger_targets;
 	
 	/**
@@ -21,7 +25,6 @@ public class Elevator {
 		current_floor = 0;
 		going_up = true;
 	
-		targets = new boolean[NUM_FLOORS];
 		passenger_targets = new int[NUM_FLOORS];
 	}
 	
@@ -44,7 +47,7 @@ public class Elevator {
 			going_up = false;
 		}
 		
-		if (targets[current_floor]) {
+		if (passenger_targets[current_floor] != 0) {
 			stop();
 		}
 	}
@@ -56,9 +59,8 @@ public class Elevator {
 	 */
 	public void stop() {
 		passenger_targets[current_floor] = 0;
-		targets[current_floor] = false;
 		
-		System.out.println("\r\nStopping on floor "+Integer.toString(current_floor+1));
+		System.out.println("\r\nStopping on floor "+(current_floor+1));
 		System.out.println(this);
 	}
 	
@@ -70,7 +72,6 @@ public class Elevator {
 	*/
 	public void boardPassenger(int floor) {
 		floor--;
-		targets[floor] = true;
 		passenger_targets[floor]++;
 	}
 	
@@ -80,9 +81,11 @@ public class Elevator {
 	public String toString() {
 		int passengers = 0;
 		for (int i=0; i<passenger_targets.length; i++) {
-			passengers += passenger_targets[i];
+			if (passenger_targets[i] > 0) {
+				passengers += passenger_targets[i];
+			}
 		}
-		return "Current Passengers: "+Integer.toString(passengers)+"\r\nCurrent Floor: "+Integer.toString(current_floor+1)+"\r\nDirection: "+(going_up?"Up":"Down");
+		return "Current Passengers: "+passengers+"\r\nCurrent Floor: "+(current_floor+1)+"\r\nDirection: "+(going_up?"Up":"Down");
 	}
 	
 	/**
